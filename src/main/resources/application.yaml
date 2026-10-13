@@ -1,0 +1,49 @@
+spring:
+  application:
+    name: marketplace-catalog
+
+  datasource:
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:catalog_db}?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: ${DB_USER:market_user}
+    password: ${DB_PASSWORD:market_pass}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: ${DDL_AUTO:update}
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    open-in-view: false
+
+server:
+  port: 8083
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://${EUREKA_HOST:localhost}:${EUREKA_PORT:8761}/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${server.port}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics, refresh
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    com.adelok.marketplace_catalog: DEBUG
+    org.hibernate.SQL: DEBUG
+steam:
+  api:
+    key: ${STEAM_API_KEY:}
+    schema-url: https://api.steampowered.com/IEconItems_570/GetSchema/v0001/
