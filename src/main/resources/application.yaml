@@ -11,7 +11,6 @@ spring:
   jpa:
     hibernate:
       ddl-auto: ${DDL_AUTO:update}
-    show-sql: true
     properties:
       hibernate:
         format_sql: true
@@ -34,7 +33,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: health, info, metrics, refresh
+        include: health, info, metrics
   endpoint:
     health:
       show-details: always
@@ -43,7 +42,7 @@ logging:
   level:
     com.adelok.marketplace_catalog: DEBUG
     org.hibernate.SQL: DEBUG
-steam:
-  api:
-    key: ${STEAM_API_KEY:}
-    schema-url: https://api.steampowered.com/IEconItems_570/GetSchema/v0001/
+app:
+  mock-seller-id: 00000000-0000-0000-0000-000000000001
+  csgo-api:
+    skins-url: https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/api/en/skins_not_grouped.json

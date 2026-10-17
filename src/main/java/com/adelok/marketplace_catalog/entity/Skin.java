@@ -1,6 +1,5 @@
 package com.adelok.marketplace_catalog.entity;
 
-import com.adelok.marketplace_catalog.entity.enumerated.SkinStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -15,7 +14,7 @@ import java.util.UUID;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "items")
+@Table(name = "skins")
 public class Skin {
 
     @Id
@@ -31,7 +30,7 @@ public class Skin {
     @Column(name = "external_id", nullable = false, unique = true)
     private String externalId;
 
-    @Column(name = "image_url", nullable = true, length = 700)
+    @Column(name = "image_url", length = 700)
     private String imageUrl;
 
     @Column(name = "rarity")
@@ -42,17 +41,6 @@ public class Skin {
 
     @Column(name = "max_float")
     private BigDecimal maxFloat;
-
-    @Column(name = "price", nullable = false)
-    private BigDecimal price;
-
-    @Column(name = "seller_id", nullable = false)
-    private UUID sellerId;
-
-    @Builder.Default
-    @Enumerated(EnumType.STRING)
-    @Column(name = "status")
-    private SkinStatus status = SkinStatus.AVAILABLE;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
