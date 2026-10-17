@@ -1,10 +1,11 @@
-package com.adelok.marketplace_catalog.dto;
+package com.adelok.marketplace_catalog.dto.parsing;
 
 
+import lombok.Builder;
 import tools.jackson.databind.PropertyNamingStrategies;
 import tools.jackson.databind.annotation.JsonNaming;
-
 import java.math.BigDecimal;
+@Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public record Cs2SkinDto(
         String id,
