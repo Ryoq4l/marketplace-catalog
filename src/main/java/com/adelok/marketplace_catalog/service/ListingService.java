@@ -26,4 +26,8 @@ public class ListingService {
     public Page<ListingDto> getCatalog(ListingStatus status, Pageable pageable){
     return listingRepository.findAllByStatus(status, pageable).map(this::toListingDto);
     }
+    @Transactional(readOnly = true)
+    public Page<ListingDto> getByWeapon(String weapon,ListingStatus status, Pageable pageable){
+        return listingRepository.findBySkin_WeaponAndStatus(weapon,status , pageable).map(this::toListingDto);
+    }
 }
