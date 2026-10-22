@@ -2,9 +2,12 @@ package com.adelok.marketplace_catalog.config;
 
 import com.adelok.marketplace_catalog.entity.Listing;
 import com.adelok.marketplace_catalog.entity.Skin;
+import com.adelok.marketplace_catalog.entity.UserItem;
+import com.adelok.marketplace_catalog.entity.enumerated.InventorySkinStatus;
 import com.adelok.marketplace_catalog.entity.enumerated.ListingStatus;
 import com.adelok.marketplace_catalog.repository.ListingRepository;
 import com.adelok.marketplace_catalog.repository.SkinRepository;
+import com.adelok.marketplace_catalog.repository.UserItemRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -23,12 +26,14 @@ public class MockData implements CommandLineRunner {
     private final SkinRepository skinRepository;
     private final ListingRepository listingRepository;
     private final UUID mockSellerId;
-
+    private final UserItemRepository userItemRepository;
     public MockData(
             @Value("${app.mock-seller-id}") UUID sellerId,
             SkinRepository skinRepository,
-            ListingRepository listingRepository
+            ListingRepository listingRepository,
+            UserItemRepository userItemRepository
     ) {
+        this.userItemRepository = userItemRepository;
         this.listingRepository = listingRepository;
         this.skinRepository = skinRepository;
         this.mockSellerId = sellerId;
@@ -52,7 +57,20 @@ public class MockData implements CommandLineRunner {
         Random random = new Random();
         skinWeaponMap.forEach((weapon, weaponSkins) -> {
             weaponSkins.stream().limit(5).forEach(skin -> {
-                listings.add(Listing.builder().skin(skin).sellerId(mockSellerId).price(BigDecimal.valueOf(50 + random.nextInt(1950))).status(ListingStatus.AVAILABLE).build());
+                UserItem userItem = UserItem.builder()
+                        .skin(skin)
+                        .ownerId(mockSellerId)
+                        .status(InventorySkinStatus.ON_SALE)
+                        .build();
+                userItemRepository.save(userItem);
+
+                Listing listing = Listing.builder()
+                        .userItem(userItem)
+                        .sellerId(mockSellerId)
+                        .price(BigDecimal.valueOf(50 + random.nextInt(1950)))
+                        .status(ListingStatus.AVAILABLE)
+                        .build();
+                listings.add(listing);
             });
         });
         listingRepository.saveAllAndFlush(listings);

@@ -12,15 +12,14 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 @Slf4j
 public class ImportRunner implements CommandLineRunner {
-private final SkinImport skinImport;
+    private final SkinImport skinImport;
 
-@Override
-    public void run(String... args) throws  Exception {
-    try{
-        skinImport.importSkins();
+    @Override
+    public void run(String... args) throws Exception {
+        try {
+            skinImport.importSkins();
+        } catch (Exception e) {
+            log.error("Import failed", e);
+        }
     }
-    catch (Exception e){
-        log.error("Import failed", e);
-    }
-}
 }

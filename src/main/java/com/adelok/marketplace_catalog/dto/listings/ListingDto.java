@@ -13,6 +13,8 @@ public record ListingDto(
         UUID id,
         BigDecimal price,
         ListingStatus status,
-        SkinDto skin
+        SkinDto skin,
+        UUID sellerId,
+        UUID ownerId
 ) {
 }

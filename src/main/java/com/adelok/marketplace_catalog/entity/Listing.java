@@ -25,9 +25,9 @@ public class Listing {
     @Column(name = "seller_id", nullable = false)
     private UUID sellerId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "skin_id")
-    private Skin skin;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_item_id")
+    private UserItem userItem;
 
     @Builder.Default
     @Enumerated(EnumType.STRING)
