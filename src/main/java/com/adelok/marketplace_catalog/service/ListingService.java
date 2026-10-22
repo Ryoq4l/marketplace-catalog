@@ -112,13 +112,36 @@ public class ListingService {
         listingRepository.save(listing);
     }
 
+    public BigDecimal calculateBuyoutPrice(UUID userItemId) {
+        UserItem item = userItemRepository.findById(userItemId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        BigDecimal minPrice = listingRepository.findMinPriceBySkinId(item.getSkin().getId());
+        if (minPrice == null) {
+            minPrice = listingRepository.findLastPriceBySkinId(item.getSkin().getId());
+        }
+        if (minPrice == null) {
+            minPrice = new BigDecimal("1000.00");
+        }
+        return minPrice.multiply(new BigDecimal("0.85"));
+    }
+
     @Transactional
-    public void sellToSys(UUID userItemId, UUID sellerId, BigDecimal price) {
+    public BigDecimal sellToSys(UUID userItemId, UUID sellerId) {
         UserItem item = userItemRepository.findById(userItemId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Item not found"));
         if (!item.getOwnerId().equals(sellerId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
+        BigDecimal marketPrice = listingRepository.findMinPriceBySkinId(item.getSkin().getId());
+        if (marketPrice == null) {
+            marketPrice = listingRepository.findLastPriceBySkinId(item.getSkin().getId());
+        }
+
+        if (marketPrice == null) {
+            marketPrice = new BigDecimal("1000.00");
+        }
+
         listingRepository.findByUserItemId(userItemId).ifPresent(listing -> {
             listingRepository.delete(listing);
             listingRepository.flush();
@@ -127,13 +150,14 @@ public class ListingService {
         item.setStatus(InventorySkinStatus.ON_SALE);
         userItemRepository.save(item);
 
+        BigDecimal listingPrice = marketPrice.multiply(new BigDecimal("0.95"));
         Listing newListing = Listing.builder()
                 .userItem(item)
                 .sellerId(mockSellerId)
-                .price(price)
+                .price(listingPrice)
                 .status(ListingStatus.AVAILABLE)
                 .build();
         listingRepository.save(newListing);
+        return marketPrice.multiply(new BigDecimal("0.85"));
     }
-
 }

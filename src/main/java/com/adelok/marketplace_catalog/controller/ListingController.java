@@ -3,16 +3,15 @@ package com.adelok.marketplace_catalog.controller;
 import com.adelok.marketplace_catalog.dto.InventoryItemDto;
 import com.adelok.marketplace_catalog.dto.listings.CreateListingRequest;
 import com.adelok.marketplace_catalog.dto.listings.ListingDto;
-
-
-import com.adelok.marketplace_catalog.entity.Listing;
 import com.adelok.marketplace_catalog.entity.UserItem;
 import com.adelok.marketplace_catalog.entity.enumerated.ListingStatus;
 import com.adelok.marketplace_catalog.repository.UserItemRepository;
 import com.adelok.marketplace_catalog.service.ListingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,14 +30,18 @@ public class ListingController {
 
     @GetMapping
     public Page<ListingDto> getCatalog(Pageable pageable) {
-
+        if (pageable.getSort().isUnsorted()) {
+            pageable = PageRequest.of(
+                    pageable.getPageNumber(),
+                    pageable.getPageSize(),
+                    Sort.by(Sort.Direction.DESC, "createdAt")
+            );
+        }
         return listingService.getCatalog(ListingStatus.AVAILABLE, pageable);
     }
 
     @PostMapping
-    public ResponseEntity<Void> createListing(
-            @RequestBody CreateListingRequest request
-    ){
+    public ResponseEntity<Void> createListing(@RequestBody CreateListingRequest request) {
         listingService.createListing(request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -47,44 +50,35 @@ public class ListingController {
     public Page<ListingDto> getByWeapon(@RequestParam String weapon, Pageable pageable) {
         return listingService.getByWeapon(weapon, ListingStatus.AVAILABLE, pageable);
     }
+
     @GetMapping("/{id}")
-    public ResponseEntity<ListingDto> getListingById(
-            @PathVariable UUID id
-    ){
-      return ResponseEntity.ok(listingService.getListingById(id));
+    public ResponseEntity<ListingDto> getListingById(@PathVariable UUID id) {
+        return ResponseEntity.ok(listingService.getListingById(id));
     }
 
     @PostMapping("/{id}/sold")
-    public void markSold(
-            @PathVariable UUID id,
-            @RequestParam UUID buyerId
-    ) {
+    public void markSold(@PathVariable UUID id, @RequestParam UUID buyerId) {
         listingService.markAsSold(id, buyerId);
     }
+
     @PostMapping("/{id}/reserve")
-    public void markReserved(
-            @PathVariable UUID id
-    ) {
+    public void markReserved(@PathVariable UUID id) {
         listingService.markReserved(id);
     }
+
     @PostMapping("/{id}/cancel")
-    public void cancelReservation(
-            @PathVariable UUID id
-    ){
+    public void cancelReservation(@PathVariable UUID id) {
         listingService.cancelReservation(id);
     }
+
     @PostMapping("/sell-to-system")
-    public void sellToSystem(
+    public BigDecimal sellToSystem(
             @RequestParam UUID userItemId,
-            @RequestParam UUID sellerId,
-            @RequestParam BigDecimal price
+            @RequestParam UUID sellerId
     ) {
-        listingService.sellToSys(userItemId, sellerId, price);
+        return listingService.sellToSys(userItemId, sellerId);
     }
-    @GetMapping("/my-inventory")
-    public List<UserItem> getMyInventory(@RequestParam UUID ownerId) {
-        return userItemRepository.findAllByOwnerId(ownerId);
-    }
+
     @GetMapping("/inventory/{ownerId}")
     @Transactional(readOnly = true)
     public List<InventoryItemDto> getInventory(@PathVariable UUID ownerId) {
@@ -94,7 +88,8 @@ public class ListingController {
                         item.getSkin().getName(),
                         item.getSkin().getImageUrl(),
                         item.getSkin().getRarity(),
-                        item.getSkin().getWeapon()
+                        item.getSkin().getWeapon(),
+                        listingService.calculateBuyoutPrice(item.getId())
                 ))
                 .toList();
     }

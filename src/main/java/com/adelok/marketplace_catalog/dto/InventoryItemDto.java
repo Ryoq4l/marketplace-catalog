@@ -1,5 +1,6 @@
 package com.adelok.marketplace_catalog.dto;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 public record InventoryItemDto(
@@ -7,5 +8,6 @@ public record InventoryItemDto(
         String name,
         String imageUrl,
         String rarity,
-        String weapon
+        String weapon,
+        BigDecimal buyoutPrice
 ) {}

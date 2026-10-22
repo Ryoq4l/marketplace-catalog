@@ -4,6 +4,7 @@ import com.adelok.marketplace_catalog.entity.enumerated.InventorySkinStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Builder
@@ -20,6 +21,9 @@ public class UserItem {
 
     @Column(name = "owner_id")
     private UUID ownerId;
+
+    @Column(name = "float_value")
+    private BigDecimal floatValue;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "skin_id")
