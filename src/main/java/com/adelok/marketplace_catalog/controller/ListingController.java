@@ -3,10 +3,10 @@ package com.adelok.marketplace_catalog.controller;
 import com.adelok.marketplace_catalog.dto.InventoryItemDto;
 import com.adelok.marketplace_catalog.dto.listings.CreateListingRequest;
 import com.adelok.marketplace_catalog.dto.listings.ListingDto;
-import com.adelok.marketplace_catalog.entity.UserItem;
 import com.adelok.marketplace_catalog.entity.enumerated.ListingStatus;
 import com.adelok.marketplace_catalog.repository.UserItemRepository;
 import com.adelok.marketplace_catalog.service.ListingService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -41,7 +41,7 @@ public class ListingController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> createListing(@RequestBody CreateListingRequest request) {
+    public ResponseEntity<Void> createListing(@Valid @RequestBody CreateListingRequest request) {
         listingService.createListing(request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
