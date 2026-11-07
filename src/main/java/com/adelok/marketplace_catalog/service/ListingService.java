@@ -130,9 +130,22 @@ public class ListingService {
     public BigDecimal sellToSys(UUID userItemId, UUID sellerId) {
         UserItem item = userItemRepository.findById(userItemId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Item not found"));
+
         if (!item.getOwnerId().equals(sellerId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You don't own this item");
         }
+
+        if (item.getStatus() != InventorySkinStatus.INVENTORY) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Item is not in inventory");
+        }
+
+        listingRepository.findByUserItemId(userItemId).ifPresent(listing -> {
+            if (listing.getStatus() != ListingStatus.SOLD) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Old listing is not sold");
+            }
+            listingRepository.delete(listing);
+            listingRepository.flush();
+        });
         BigDecimal marketPrice = listingRepository.findMinPriceBySkinId(item.getSkin().getId());
         if (marketPrice == null) {
             marketPrice = listingRepository.findLastPriceBySkinId(item.getSkin().getId());
@@ -142,10 +155,6 @@ public class ListingService {
             marketPrice = new BigDecimal("1000.00");
         }
 
-        listingRepository.findByUserItemId(userItemId).ifPresent(listing -> {
-            listingRepository.delete(listing);
-            listingRepository.flush();
-        });
         item.setOwnerId(mockSellerId);
         item.setStatus(InventorySkinStatus.ON_SALE);
         userItemRepository.save(item);
@@ -158,6 +167,7 @@ public class ListingService {
                 .status(ListingStatus.AVAILABLE)
                 .build();
         listingRepository.save(newListing);
+
         return marketPrice.multiply(new BigDecimal("0.85"));
     }
 }
