@@ -9,7 +9,6 @@ import com.adelok.marketplace_catalog.entity.UserItem;
 import com.adelok.marketplace_catalog.entity.enumerated.InventorySkinStatus;
 import com.adelok.marketplace_catalog.entity.enumerated.ListingStatus;
 import com.adelok.marketplace_catalog.repository.ListingRepository;
-import com.adelok.marketplace_catalog.repository.SkinRepository;
 import com.adelok.marketplace_catalog.repository.UserItemRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,7 +26,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ListingService {
     private final ListingRepository listingRepository;
-    private final SkinRepository skinRepository;
     @Value("${app.mock-seller-id}")
     UUID mockSellerId;
     private final UserItemRepository userItemRepository;
