@@ -24,20 +24,14 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @CrossOrigin(origins = "http://localhost:8080")
-@RequestMapping("/api/v1/items")
+@RequestMapping("/items")
 public class ListingController {
     private final ListingService listingService;
     private final UserItemRepository userItemRepository;
 
     @GetMapping
-    public Page<ListingDto> getCatalog(Pageable pageable) {
-        if (pageable.getSort().isUnsorted()) {
-            pageable = PageRequest.of(
-                    pageable.getPageNumber(),
-                    pageable.getPageSize(),
-                    Sort.by(Sort.Direction.DESC, "createdAt")
-            );
-        }
+    public Page<ListingDto> getCatalog(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         return listingService.getCatalog(ListingStatus.AVAILABLE, pageable);
     }
 
