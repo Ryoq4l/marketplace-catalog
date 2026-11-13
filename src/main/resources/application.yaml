@@ -1,13 +1,11 @@
 spring:
-  config:
-    import: optional:file:.env[.properties]
   application:
     name: marketplace-catalog
 
   datasource:
     url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:catalog_db}?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
     username: ${DB_USER:market_user}
-    password: ${DB_PASSWORD:market_pass}
+    password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
@@ -17,8 +15,9 @@ spring:
       hibernate:
         format_sql: true
     open-in-view: false
+
 jwt:
-  secret: ${JWT_SECRET:dev-only-secret-change-me-in-production-1234567890abcdef}
+  secret: ${JWT_SECRET}
 
 server:
   port: 8083
@@ -46,10 +45,12 @@ logging:
   level:
     com.adelok.marketplace_catalog: DEBUG
     org.hibernate.SQL: DEBUG
+
 app:
   mock-seller-id: 00000000-0000-0000-0000-000000000001
   csgo-api:
     skins-url: https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/api/en/skins_not_grouped.json
+
 springdoc:
   api-docs:
     server-url: http://localhost:8080/api/v1/items

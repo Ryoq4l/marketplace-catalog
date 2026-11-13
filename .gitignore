@@ -33,3 +33,9 @@ build/
 .vscode/
 
 settings.xml
+
+# Локальные секреты и профили
+**/application-local.yaml
+**/application-local.yml
+.env
+secrets/
